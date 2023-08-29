@@ -6,9 +6,15 @@ use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Del;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
-#[ApiResource]
+
+#[Put(security: "is_granted('ROLE_ADMIN') or object.client == user")]
+#[Del(security: "is_granted('ROLE_ADMIN') or object.client == user")]
+#[ApiResource()]
+
 class Reservation
 {
     #[ORM\Id]
@@ -20,7 +26,7 @@ class Reservation
     private ?\DateTimeInterface $debut = null;
 
     #[ORM\Column]
-    private ?bool $valide = null;
+    private ?bool $valide = false;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]

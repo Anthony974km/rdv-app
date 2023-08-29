@@ -3,5 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+    # create_reservation:
+    #     path: '/api/reservation/create'
+    #     methods: ['POST']
 api_login_check:
     path: /api/login_check
