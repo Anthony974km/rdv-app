@@ -12,13 +12,13 @@ use Doctrine\ORM\EntityManagerInterface;
 class ReservationController extends AbstractController
 {
 
-    #[Route('/reservation/create', name: 'app_create_reservation')]
+    #[Route('/api/reservation/create', name: 'app_create_reservation', methods: ['POST'])]
     public function createReservation(EntityManagerInterface $em, Request $request): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $requestData = json_decode($request->getContent(), true);
         $debut = new \DateTime($requestData['debut']);
         $client = $this->getUser();
-        print_r($client);
         $reservation = new Reservation();
         $reservation->setClient($client);
         $reservation->setDebut($debut);

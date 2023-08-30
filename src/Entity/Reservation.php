@@ -12,7 +12,7 @@ use ApiPlatform\Metadata\Del;
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 
 #[Put(security: "is_granted('ROLE_ADMIN') or object.client == user")]
-#[Del(security: "is_granted('ROLE_ADMIN') or object.client == user")]
+#[Del(security: "is_granted('ROLE_ADMIN')")]
 #[ApiResource()]
 
 class Reservation
