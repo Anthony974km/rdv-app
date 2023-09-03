@@ -1,0 +1,19 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: RDV APP
+            description: prise de rendez vous application!
+            version: 1.0.0
+        security:
+            - jwt: []
+        components:
+            securitySchemes:
+                jwt:
+                    type: apiKey
+                    in: header
+                    name: Authorization # or another header name
+
+
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
