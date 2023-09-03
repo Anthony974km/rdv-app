@@ -5,9 +5,6 @@ namespace App\Entity;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Del;
 use OpenApi\Annotations as OA;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]

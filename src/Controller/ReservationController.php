@@ -93,4 +93,153 @@ class ReservationController extends AbstractController
 
         return $this->json(['status' => 'Reservation created successfully!', 'reservation_id' => $reservation->getId()], Response::HTTP_OK);
     }
+    /**
+     * @OA\Put(
+     *     path="/api/reservation/{id}",
+     *     tags={"Reservation"},
+     *     summary="Modify an existing reservation",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         description="Updated reservation data",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="debut", type="string", format="date-time"),
+     *             @OA\Property(property="valide", type="boolean"),
+     *             @OA\Property(property="professionel_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Reservation updated successfully"),
+     *     @OA\Response(response=400, description="Invalid input"),
+     *     @OA\Response(response=401, description="Not authorized"),
+     *     @OA\Response(response=403, description="You can only modify your own reservations"),
+     *     @OA\Response(response=404, description="Reservation or Professional not found"),
+     * @sec(name="Bearer")
+     * )
+     */
+    #[Route('/api/reservation/{id}', name: 'modify_reservation', methods: ['PUT'])]
+    public function modify(int $id, Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Not authorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $reservation = $this->entityManager->getRepository(Reservation::class)->find($id);
+
+        if (!$reservation) {
+            return $this->json(['error' => 'Reservation not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($reservation->getClient()->getId() !== $user->getId()) {
+            return $this->json(['error' => 'You can only modify your own reservations'], Response::HTTP_FORBIDDEN);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['debut'])) {
+            $reservation->setDebut(new \DateTime($data['debut']));
+        }
+
+        if (isset($data['valide'])) {
+            $reservation->setValide($data['valide']);
+        }
+
+        if (isset($data['professionel_id'])) {
+            $professionel = $this->entityManager->getRepository(User::class)->find($data['professionel_id']);
+            if (!$professionel) {
+                return $this->json(['error' => 'Professional not found'], Response::HTTP_NOT_FOUND);
+            }
+            $reservation->setProfessionel($professionel);
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json(['status' => 'Reservation updated successfully!'], Response::HTTP_OK);
+    }
+    /**
+     * @OA\Delete(
+     *     path="/api/reservation/{id}",
+     *     tags={"Reservation"},
+     *     summary="Delete a reservation",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Reservation deleted successfully"),
+     *     @OA\Response(response=401, description="Not authorized"),
+     *     @OA\Response(response=403, description="You can only delete your own reservations"),
+     *     @OA\Response(response=404, description="Reservation not found"),
+     * @sec(name="Bearer")
+     * )
+     */
+    #[Route('/api/reservation/{id}', name: 'delete_reservation', methods: ['DELETE'])]
+    public function delete(int $id): Response
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Not authorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $reservation = $this->entityManager->getRepository(Reservation::class)->find($id);
+
+        if (!$reservation) {
+            return $this->json(['error' => 'Reservation not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($reservation->getClient()->getId() !== $user->getId()) {
+            return $this->json(['error' => 'You can only delete your own reservations'], Response::HTTP_FORBIDDEN);
+        }
+
+        $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
+
+        return $this->json(['status' => 'Reservation deleted successfully!'], Response::HTTP_OK);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/reservations/me",
+     *     tags={"Reservation"},
+     *     summary="Retrieve reservations of authenticated client",
+     *     @OA\Response(response=200, description="List of reservations"),
+     *     @OA\Response(response=401, description="Not authorized"),
+     * @sec(name="Bearer")
+     * )
+     */
+    #[Route('/api/reservations/me', name: 'get_my_reservations', methods: ['GET'])]
+    public function getMyReservations(): Response
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Not authorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $reservations = $this->entityManager->getRepository(Reservation::class)->findBy(['client' => $user]);
+
+        $data = [];
+        foreach ($reservations as $reservation) {
+            $data[] = [
+                'id' => $reservation->getId(),
+                'debut' => $reservation->getDebut()->format('Y-m-d H:i:s'),
+                'valide' => $reservation->isValide(),
+                'professionel_id' => $reservation->getProfessionel()->getId()
+            ];
+        }
+
+        return $this->json(['reservations' => $data], Response::HTTP_OK);
+    }
 }
