@@ -31,8 +31,8 @@ class RegistrationController extends AbstractController
     /**
      * @OA\Post(
      *     path="/api/registerAPI",
-     *     tags={"User Registration"},
-     *     summary="Register a new professional",
+     *     tags={"User"},
+     *     summary="Register a new User",
      *     @OA\RequestBody(
      *         description="Professional to be registered",
      *         required=true,
@@ -106,7 +106,7 @@ class RegistrationController extends AbstractController
     /**
      * @OA\Post(
      *     path="/api/registerProfessionalAPI",
-     *     tags={"Professional Registration"},
+     *     tags={"User"},
      *     summary="Register a new professional",
      *     @OA\RequestBody(
      *         description="Professional to be registered",
@@ -160,7 +160,7 @@ class RegistrationController extends AbstractController
     /**
      * @OA\Get(
      *     path="/api/professionals",
-     *     tags={"Professionals"},
+     *     tags={"User"},
      *     summary="Retrieve a list of professionals",
      *     @OA\Response(response=200, description="List of professionals retrieved successfully"),
      *     @OA\Response(response=400, description="Invalid input")
