@@ -8,15 +8,26 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Del;
+use OpenApi\Annotations as OA;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 
-#[Put(security: "is_granted('ROLE_ADMIN') or object.client == user")]
-#[Del(security: "is_granted('ROLE_ADMIN')")]
-#[ApiResource()]
-
+/**
+ * @OA\Schema(
+ *     description="Reservation model",
+ *     type="object",
+ *     title="Reservation model"
+ * )
+ */
 class Reservation
 {
+    /**
+     * @OA\Property(
+     *     format="int64",
+     *     description="The unique identifier for the reservation",
+     *     title="ID"
+     * )
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
