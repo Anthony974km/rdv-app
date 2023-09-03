@@ -117,7 +117,7 @@ class ReservationController extends AbstractController
      *     @OA\Response(response=200, description="Reservation updated successfully"),
      *     @OA\Response(response=400, description="Invalid input"),
      *     @OA\Response(response=401, description="Not authorized"),
-     *     @OA\Response(response=403, description="You can only modify your own reservations"),
+     *     @OA\Response(response=403, description="You can only modify reservations you are associated with or created"),
      *     @OA\Response(response=404, description="Reservation or Professional not found"),
      * @sec(name="Bearer")
      * )
@@ -138,8 +138,9 @@ class ReservationController extends AbstractController
             return $this->json(['error' => 'Reservation not found'], Response::HTTP_NOT_FOUND);
         }
 
-        if ($reservation->getClient()->getId() !== $user->getId()) {
-            return $this->json(['error' => 'You can only modify your own reservations'], Response::HTTP_FORBIDDEN);
+        // Checking if the authenticated user is the professional associated with the reservation or the client who created it
+        if ($reservation->getProfessionel()->getId() !== $user->getId() && $reservation->getClient()->getId() !== $user->getId()) {
+            return $this->json(['error' => 'You can only modify reservations you are associated with or created'], Response::HTTP_FORBIDDEN);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -164,6 +165,7 @@ class ReservationController extends AbstractController
 
         return $this->json(['status' => 'Reservation updated successfully!'], Response::HTTP_OK);
     }
+
     /**
      * @OA\Delete(
      *     path="/api/reservation/{id}",
@@ -242,4 +244,53 @@ class ReservationController extends AbstractController
 
         return $this->json(['reservations' => $data], Response::HTTP_OK);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/professional/reservations",
+     *     tags={"Reservation"},
+     *     summary="Get all reservations of the authenticated professional",
+     *     @OA\Response(response=200, description="List of reservations for the professional"),
+     *     @OA\Response(response=401, description="Not authorized"),
+     *     @OA\Response(response=403, description="Insufficient permissions. Only professionals can view reservations."),
+     *     @OA\Response(response=404, description="Professional not found"),
+     * @sec(name="Bearer")
+     * )
+     */
+    #[Route('/api/professional/reservations', name: 'get_professional_reservations', methods: ['GET'])]
+    public function getReservationsForProfessional(): Response
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        // Check if the user is authenticated
+        if (!$user) {
+            return $this->json(['error' => 'Not authorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Check if the user has the ROLE_PROFESSIONAL
+        if (!in_array('ROLE_PROFESSIONAL', $user->getRoles())) {
+            return $this->json(['error' => "Insufficient permissions. Only professionals can view reservations."], Response::HTTP_FORBIDDEN);
+        }
+
+        $reservations = $this->entityManager->getRepository(Reservation::class)->findBy(['professionel' => $user]);
+
+        // Check if there are any reservations
+        if (!$reservations) {
+            return $this->json(['error' => 'No reservations found for this professional'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = [];
+        foreach ($reservations as $reservation) {
+            $data[] = [
+                'id' => $reservation->getId(),
+                'debut' => $reservation->getDebut()->format('Y-m-d H:i:s'),
+                'valide' => $reservation->isValide(),
+                'client_id' => $reservation->getClient()->getId(),
+            ];
+        }
+
+        return $this->json($data, Response::HTTP_OK);
+    }
+
 }

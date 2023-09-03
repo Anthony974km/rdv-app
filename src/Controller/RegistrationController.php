@@ -181,4 +181,29 @@ class RegistrationController extends AbstractController
 
         return $this->json($data);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     tags={"User"},
+     *     summary="Retrieve a list of users",
+     *     @OA\Response(response=200, description="List of user retrieved successfully"),
+     *     @OA\Response(response=400, description="Invalid input")
+     * )
+     */
+    #[Route('/api/users', name: 'get_users', methods: ['GET'])]
+    public function getUsers(): JsonResponse
+    {
+        $professionals = $this->userRepository->findUsers();
+
+        $data = [];
+        foreach ($professionals as $professional) {
+            $data[] = [
+                'id' => $professional->getId(),
+                'email' => $professional->getEmail(),
+            ];
+        }
+
+        return $this->json($data);
+    }
 }
