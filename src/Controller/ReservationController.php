@@ -70,17 +70,18 @@ class ReservationController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        if (!$data['debut'] || !$data['professionel_id']) {
+        if (!$data['debut'] || !$data['valide']) {
             return $this->json(['error' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
         }
-
-        $professionel = $this->entityManager
-            ->getRepository(User::class)
-            ->find($data['professionel_id']);
-
-        if (!$professionel) {
-            return $this->json(['error' => 'Professional not found'], Response::HTTP_NOT_FOUND);
+        $professionel = null;
+        if (isset($data['professionel_id'])){
+            $professionel = $this->entityManager
+                ->getRepository(User::class)
+                ->find($data['professionel_id']);
         }
+
+
+
 
         $reservation = new Reservation();
         $reservation->setClient($user);
