@@ -4,14 +4,20 @@
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
+// Vérifie si le fichier autoload_runtime.php existe
 if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {
+    // Si le fichier n'existe pas, lance une exception indiquant que le Symfony Runtime est manquant
     throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
 }
 
+// Inclut le fichier autoload_runtime.php pour charger les dépendances nécessaires
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
+// Retourne une fonction anonyme prenant un tableau $context en entrée
 return function (array $context) {
+    // Crée une nouvelle instance du noyau (kernel) de l'application Symfony
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
 
+    // Crée une instance de la classe Application en utilisant le noyau (kernel) créé
     return new Application($kernel);
 };

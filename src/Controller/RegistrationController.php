@@ -21,11 +21,19 @@ class RegistrationController extends AbstractController
     private UserRepository $userRepository;
     private LoggerInterface $logger;
 
-    public function __construct(EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher,UserRepository $userRepository, LoggerInterface $logger)
+    public function __construct(EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository, LoggerInterface $logger)
     {
+        // Injecte les dépendances nécessaires dans le contrôleur lors de sa création
+    
+        // Entité gérant la persistance des objets
         $this->entityManager = $entityManager;
+    
+        // Service permettant de hasher les mots de passe des utilisateurs
         $this->passwordHasher = $passwordHasher;
+    
+        // Repository pour accéder aux données des utilisateurs
         $this->userRepository = $userRepository;
+
         $this->logger = $logger;
     }
     /**
@@ -57,6 +65,7 @@ class RegistrationController extends AbstractController
     #[Route('/api/registerAPI', name: 'user_registration', methods: ['POST'])]
     public function register(Request $request): Response
     {
+        // Cette méthode gère l'enregistrement d'un nouvel utilisateur
         return $this->registerUser($request, ['ROLE_USER']);
     }
 
@@ -133,6 +142,7 @@ class RegistrationController extends AbstractController
     #[Route('/api/registerProfessionalAPI', name: 'professional_registration', methods: ['POST'])]
     public function registerProfessional(Request $request): Response
     {
+        // Cette méthode gère l'enregistrement d'un nouveau professionnel
         return $this->registerUser($request, ['ROLE_PROFESSIONAL']);
     }
 
@@ -169,6 +179,9 @@ class RegistrationController extends AbstractController
     #[Route('/api/professionals', name: 'get_professionals', methods: ['GET'])]
     public function getProfessionals(): JsonResponse
     {
+        // Cette méthode récupère la liste des professionnels
+        // Elle transforme ensuite les données récupérées en un tableau JSON
+
         $professionals = $this->userRepository->findProfessionals();
 
         $data = [];
@@ -194,6 +207,8 @@ class RegistrationController extends AbstractController
     #[Route('/api/users', name: 'get_users', methods: ['GET'])]
     public function getUsers(): JsonResponse
     {
+        // Cette méthode récupère la liste des utilisateurs
+        // Elle transforme ensuite les données récupérées en un tableau JSON
         $professionals = $this->userRepository->findUsers();
 
         $data = [];

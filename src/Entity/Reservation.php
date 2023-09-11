@@ -28,20 +28,20 @@ class Reservation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id = null; // Identifiant unique de la réservation
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $debut = null;
+    private ?\DateTimeInterface $debut = null; // Date de début de la réservation
 
     #[ORM\Column]
-    private ?bool $valide = false;
+    private ?bool $valide = false; // Indique si la réservation est valide
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $client = null;
+    private ?User $client = null; // Utilisateur client associé à la réservation
 
     #[ORM\ManyToOne]
-    private ?User $professionel = null;
+    private ?User $professionel = null; // Utilisateur professionnel associé à la réservation
 
     public function getId(): ?int
     {

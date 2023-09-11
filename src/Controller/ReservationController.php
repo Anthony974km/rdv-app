@@ -61,6 +61,7 @@ class ReservationController extends AbstractController
     #[Route('/api/reservation/create', name: 'create_reservation', methods: ['POST'])]
     public function create(Request $request): Response
     {
+         // Cette méthode gère la création d'une nouvelle réservation
         /** @var User $user */
         $user = $this->security->getUser();
 
@@ -126,6 +127,7 @@ class ReservationController extends AbstractController
     #[Route('/api/reservation/{id}', name: 'modify_reservation', methods: ['PUT'])]
     public function modify(int $id, Request $request): Response
     {
+        // Cette méthode gère la modification d'une réservation existante
         /** @var User $user */
         $user = $this->security->getUser();
 
@@ -188,6 +190,7 @@ class ReservationController extends AbstractController
     #[Route('/api/reservation/{id}', name: 'delete_reservation', methods: ['DELETE'])]
     public function delete(int $id): Response
     {
+        // Cette méthode supprime une réservation existante
         /** @var User $user */
         $user = $this->security->getUser();
 
@@ -224,6 +227,7 @@ class ReservationController extends AbstractController
     #[Route('/api/reservations/me', name: 'get_my_reservations', methods: ['GET'])]
     public function getMyReservations(): Response
     {
+        // Cette méthode récupère les réservations associées à l'utilisateur actuellement authentifié
         /** @var User $user */
         $user = $this->security->getUser();
 
@@ -261,6 +265,7 @@ class ReservationController extends AbstractController
     #[Route('/api/professional/reservations', name: 'get_professional_reservations', methods: ['GET'])]
     public function getReservationsForProfessional(): Response
     {
+        //Cette méthode récupère toutes les réservations
         /** @var User $user */
         $user = $this->security->getUser();
 
