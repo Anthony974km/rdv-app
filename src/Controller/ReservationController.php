@@ -70,7 +70,7 @@ class ReservationController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        if (!$data['debut'] || !$data['valide']) {
+        if (!$data['debut'] ) {
             return $this->json(['error' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
         }
         $professionel = null;
@@ -239,7 +239,7 @@ class ReservationController extends AbstractController
                 'id' => $reservation->getId(),
                 'debut' => $reservation->getDebut()->format('Y-m-d H:i:s'),
                 'valide' => $reservation->isValide(),
-                'professionel_id' => $reservation->getProfessionel()->getId()
+                'professionel_id' => $reservation->getProfessionel()->getEmail()??''
             ];
         }
 
@@ -287,7 +287,7 @@ class ReservationController extends AbstractController
                 'id' => $reservation->getId(),
                 'debut' => $reservation->getDebut()->format('Y-m-d H:i:s'),
                 'valide' => $reservation->isValide(),
-                'client_id' => $reservation->getClient()->getId(),
+                'client' => $reservation->getClient()->getEmail(),
             ];
         }
 

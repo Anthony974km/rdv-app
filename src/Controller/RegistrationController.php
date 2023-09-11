@@ -206,4 +206,20 @@ class RegistrationController extends AbstractController
 
         return $this->json($data);
     }
+
+    /**
+     * @Route("/api/howiam", methods="GET")
+     */
+    public function getUserDetails(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], 404);
+        }
+
+        return new JsonResponse([
+            'roles'    => $user->getRoles()
+        ]);
+    }
 }
